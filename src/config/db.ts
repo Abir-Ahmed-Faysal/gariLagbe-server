@@ -18,7 +18,7 @@ const initDb = async () => {
       );
     `);
 
-    console.log('Database initialized successfully!');
+    console.log('Database connection stablish successfully!');
   } catch (error: any) {
     console.error('DB Error:', error.message);
   }
