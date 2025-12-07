@@ -1,13 +1,11 @@
 import { Request, Response } from "express";
 import { sendRes } from "../../utilities/sendRes";
-import bcrypt from "bcryptjs";
-import newUserCreate from "./user.service";
 
-const createUser = async (req: Request, res: Response) => {
-    console.log(req.body);
+
+const booking = async (req: Request, res: Response) => {
     const { name, email, password, phone, role } = req.body;
-    // {
-    //   "name": "John Doe",
+    //{
+    //   "vechicle name": "John Doe",
     //   "email": "john.doe@example.com",
     //   "password": "securePassword123",
     //   "phone": "01712345678",
@@ -15,7 +13,7 @@ const createUser = async (req: Request, res: Response) => {
     // }
 
 
-    if (!name || !email || !password || !phone || !role) {
+    if () {
         return sendRes(res, {
             status: 400,
             success: false,
@@ -32,7 +30,6 @@ const createUser = async (req: Request, res: Response) => {
         });
     }
 
-    const lowerCasedEmail = email.toLowerCase();
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -43,31 +40,20 @@ const createUser = async (req: Request, res: Response) => {
             status: 201,
             success: true,
             message: "User created successfully",
-            data: result,
+            data: result.rows[0],
         });
 
     } catch (error: any) {
-        console.log(error);
-
-        if (error.code === "23505") {
-            return sendRes(res, {
-                status: 409,
-                success: false,
-                message: "Email already exists",
-                data: null,
-            });
-        }
-
+        console.log(error.message);
         return sendRes(res, {
             status: 500,
             success: false,
-            message: error ? error?.message : "User creation failed due to server error",
+            message: "User creation failed due to server error",
             data: null,
         });
-
     }
 };
 
-export const userController = {
-    createUser,
+export const bookingController = {
+    createUser: booking,
 };

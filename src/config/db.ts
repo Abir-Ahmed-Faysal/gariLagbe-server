@@ -1,8 +1,8 @@
 import { Pool } from 'pg';
+import config from '.';
 
 export const pool = new Pool({
-  connectionString:
-    'postgresql://neondb_owner:npg_xoq4uLYCP6Wd@ep-restless-bar-adc4d8ij-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
+  connectionString: config.connectionStr
 });
 
 const initDb = async () => {
@@ -11,17 +11,40 @@ const initDb = async () => {
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
-        email VARCHAR(150) NOT NULL UNIQUE ,
+        email VARCHAR(150) NOT NULL UNIQUE,
         password TEXT NOT NULL,
         phone VARCHAR(20) NOT NULL,
-        role VARCHAR(20) NOT NULL 
+        role VARCHAR(20) NOT NULL
       );
     `);
 
-    console.log('Database connection stablish successfully!');
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS vehicles (
+        id SERIAL PRIMARY KEY,
+        vehicle_name VARCHAR(200) NOT NULL,
+        type VARCHAR(100) NOT NULL,
+        registration_number VARCHAR(200) NOT NULL UNIQUE,
+        daily_rent_price INT NOT NULL,
+        availability_status BOOLEAN NOT NULL DEFAULT TRUE
+      );
+    `);
+
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS bookings (
+        id SERIAL PRIMARY KEY,
+        customer_id INT REFERENCES users(id) ON DELETE CASCADE,
+        vehicle_id INT REFERENCES vehicles(id) ON DELETE CASCADE,
+        rent_start_date TIMESTAMP NOT NULL DEFAULT NOW(),
+        rent_end_date TIMESTAMP NOT NULL,
+        total_price FLOAT NOT NULL
+      );
+    `);
+
+    console.log('Database connected & Tables created successfully!');
   } catch (error: any) {
-    console.error('DB Error:', error.message);
+    console.error('DB Error:', error);
   }
 };
+
 
 export { initDb };

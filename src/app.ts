@@ -1,13 +1,14 @@
 import express, { Request, Response } from "express"
 import { initDb } from "./config/db"
-import { userController } from "./modules/user/user.controller"
+import { userRoutes } from "./modules/user/user.routes"
 const app = express()
+app.use(express.json())
 
 
 initDb()
 
 
-app.use('/app/v1/user',userController.createUser)
+app.use('/app/v1/user', userRoutes)
 
 
 app.get('/', (req: Request, res: Response) => {
