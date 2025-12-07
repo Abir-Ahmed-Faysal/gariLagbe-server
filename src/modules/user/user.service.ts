@@ -1,11 +1,13 @@
 import { pool } from "../../config/db";
 
 interface UserResult {
+  id?: string,
   name: string;
   email: string;
   phone: string;
   role: string;
 }
+
 
 const newUserCreate = async (
   name: string,
@@ -26,4 +28,38 @@ const newUserCreate = async (
   return result.rows[0];
 };
 
-export default newUserCreate;
+
+const getAllUserLogic = async () => {
+  const result = await pool.query(`
+  SELECT id,name, email, phone, role FROM users
+  `)
+  return result;
+}
+
+
+const getSingleUer = async (id: string) => {
+  try {
+
+    const result = await pool.query(`
+  SELECT id,name, email, phone, role FROM users WHERE id=$1
+  `, [id])
+    return result;
+
+  } catch (error: any) {
+
+    console.error("Database error (getSingleUser):", error?.message);
+    throw new Error("Failed to fetch user");
+
+  }
+
+
+}
+
+
+const updateLogic = async () => {
+}
+
+
+
+
+export const userServices = { newUserCreate, getAllUserLogic, updateLogic, getSingleUer };

@@ -25,7 +25,7 @@ const initDb = async () => {
         type VARCHAR(100) NOT NULL,
         registration_number VARCHAR(200) NOT NULL UNIQUE,
         daily_rent_price INT NOT NULL,
-        availability_status BOOLEAN NOT NULL DEFAULT TRUE
+        availability_status VARCHAR(20) NOT NULL DEFAULT TRUE
       );
     `);
 

@@ -4,5 +4,5 @@ import config from "./config"
 const port = config.port||5000
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`gari-bhara app listening on port ${port}`)
 })
