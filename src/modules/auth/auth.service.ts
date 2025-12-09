@@ -27,7 +27,7 @@ const signUp = async (
 
 
 
-const loginUserIntoDB = async (email: string, password: string) => {
+const loginUserIntoDB = async (email: string, payloadPassword: string) => {
     const user = await pool.query(
         `
         SELECT * FROM users WHERE email=$1
@@ -39,7 +39,7 @@ const loginUserIntoDB = async (email: string, password: string) => {
     if (user.rows.length === 0) {
         throw new Error("User not found!");
     }
-    const matchPassword = await bcrypt.compare(password, user.rows[0].password);
+    const matchPassword = await bcrypt.compare(payloadPassword, user.rows[0].password);
 
     if (!matchPassword) {
         throw new Error("Invalid Credentials!");
@@ -52,8 +52,9 @@ const loginUserIntoDB = async (email: string, password: string) => {
     };
 
     const token = jwt.sign(jwtPayload, secret, { expiresIn: "7d" });
+    const {password,...rest}= user.rows[0]
 
-    return { token, user: user.rows[0] };
+    return { token, user: rest };
 };
 
 

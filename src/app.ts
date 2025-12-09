@@ -18,13 +18,13 @@ app.get('/', (req: Request, res: Response) => {
 
 
 
-app.use('/app/v1/auth',authRoute)
+app.use('/api/v1/auth',authRoute)
 
-app.use('/app/v1/users', userRoutes)
+app.use('/api/v1/users', userRoutes)
 
-app.use('/app/v1/vehicles', vehicleRoutes)
+app.use('/api/v1/vehicles', vehicleRoutes)
 
-app.use('/app/v1/bookings', bookingRoutes)
+app.use('/api/v1/bookings', bookingRoutes)
 
 
 
