@@ -18,25 +18,27 @@ const initDb = async () => {
       );
     `);
 
-    await pool.query(`
+     await pool.query(`
       CREATE TABLE IF NOT EXISTS vehicles (
         id SERIAL PRIMARY KEY,
         vehicle_name VARCHAR(200) NOT NULL,
         type VARCHAR(100) NOT NULL,
         registration_number VARCHAR(200) NOT NULL UNIQUE,
         daily_rent_price INT NOT NULL,
-        availability_status VARCHAR(20) NOT NULL DEFAULT TRUE
+        availability_status VARCHAR(20) NOT NULL DEFAULT 'available'
       );
     `);
 
+    /* BOOKINGS TABLE */
     await pool.query(`
       CREATE TABLE IF NOT EXISTS bookings (
         id SERIAL PRIMARY KEY,
         customer_id INT REFERENCES users(id) ON DELETE CASCADE,
         vehicle_id INT REFERENCES vehicles(id) ON DELETE CASCADE,
-        rent_start_date TIMESTAMP NOT NULL DEFAULT NOW(),
+        rent_start_date TIMESTAMP NOT NULL,
         rent_end_date TIMESTAMP NOT NULL,
-        total_price FLOAT NOT NULL
+        total_price FLOAT NOT NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'active'
       );
     `);
 

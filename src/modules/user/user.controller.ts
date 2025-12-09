@@ -5,63 +5,7 @@ import { userServices } from "./user.service";
 
 
 
-const createUser = async (req: Request, res: Response) => {
-    const { name, email, password, phone, role } = req.body;
-   
 
-
-    if (!name || !email || !password || !phone || !role) {
-        return sendRes(res, {
-            status: 400,
-            success: false,
-            message: "Please provide name, email, password & phone number",
-            data: null,
-        });
-    }
-    if (!["admin", "customer"].includes(role)) {
-        return sendRes(res, {
-            status: 400,
-            success: false,
-            message: "the role would be only 'customer' or 'admin'",
-            data: null,
-        });
-    }
-
-    const lowerCasedEmail = email.toLowerCase();
-
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const result = await userServices.newUserCreate(name, lowerCasedEmail, hashedPassword, phone, role)
-
-        return sendRes(res, {
-            status: 201,
-            success: true,
-            message: "User registered successfully",
-            data: result,
-        });
-
-    } catch (error: any) {
-        console.log(error);
-
-        if (error.code === "23505") {
-            return sendRes(res, {
-                status: 409,
-                success: false,
-                message: "Email already exists",
-                data: null,
-            });
-        }
-
-        return sendRes(res, {
-            status: 500,
-            success: false,
-            message: error ? error?.message : "User creation failed due to server error",
-            data: null,
-        });
-
-    }
-};
 
 
 
@@ -90,10 +34,10 @@ const getAllUser = async (req: Request, res: Response) => {
 
 
 const getSingleUser = async (req: Request, res: Response) => {
-    const { id } = req.params;
+    const { userId  } = req.params;
 
     try {
-        const result = await userServices.getSingleUer(id!);
+        const result = await userServices.getSingleUer(userId!);
 
         if (!result || result.rows.length === 0) {
             return sendRes(res, {
@@ -140,16 +84,10 @@ const updateUser = async (req: Request, res: Response) => {
 const deleteUser = async (req: Request, res: Response) => {
 
     // const result =
-
-
-
-
-
 }
 
 
 
 
-export const userController = {
-    createUser, getAllUser, updateUser, getSingleUser, deleteUser
+export const userController = { getAllUser, updateUser, getSingleUser, deleteUser
 };

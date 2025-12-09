@@ -9,7 +9,7 @@ interface UserResult {
 }
 
 
-const newUserCreate = async (
+const signUp = async (
   name: string,
   lowerCasedEmail: string,
   hashedPassword: string,
@@ -37,12 +37,12 @@ const getAllUserLogic = async () => {
 }
 
 
-const getSingleUer = async (id: string) => {
+const getSingleUer = async (userId: string) => {
   try {
 
     const result = await pool.query(`
   SELECT id,name, email, phone, role FROM users WHERE id=$1
-  `, [id])
+  `, [userId])
     return result;
 
   } catch (error: any) {
@@ -62,4 +62,4 @@ const updateLogic = async () => {
 
 
 
-export const userServices = { newUserCreate, getAllUserLogic, updateLogic, getSingleUer };
+export const userServices = { signUp , getAllUserLogic, updateLogic, getSingleUer };

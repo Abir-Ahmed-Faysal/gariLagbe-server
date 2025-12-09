@@ -1,59 +1,59 @@
 import { Request, Response } from "express";
 import { sendRes } from "../../utilities/sendRes";
+import { bookingServices } from "./booking.service";
 
 
-// const booking = async (req: Request, res: Response) => {
-//     const { name, email, password, phone, role } = req.body;
-//     //{
-//     //   "vechicle name": "John Doe",
-//     //   "email": "john.doe@example.com",
-//     //   "password": "securePassword123",
-//     //   "phone": "01712345678",
-//     //   "role": "customer"
-//     // }
+
+export const newBooking = async (req: Request, res: Response) => {
+  const { customer_id, vehicle_id, rent_start_date, rent_end_date } = req.body;
+
+  if (!customer_id || !vehicle_id || !rent_start_date || !rent_end_date) {
+    return sendRes(res, { status: 400, success: false, message: 'All fields are required' });
+  }
+
+  try {
+    const booking = await bookingServices.createBooking(customer_id, vehicle_id, rent_start_date, rent_end_date);
+    return sendRes(res, { status: 201, success: true, message: 'Booking created successfully', data: booking });
+  } catch (err: any) {
+    console.log(err.message);
+    return sendRes(res, { status: 500, success: false, message: 'Booking creation failed' });
+  }
+};
+
+export const getAllBooking = async (req: Request, res: Response) => {
+  const userId = (req.user as any).id;
+  const role = (req.user as any).role;
+
+  try {
+    const bookings = await bookingServices.getAllBookings(userId, role);
+    return sendRes(res, { status: 200, success: true, message: role === 'admin' ? 'Bookings retrieved successfully' : 'Your bookings retrieved successfully', data: bookings });
+  } catch (err: any) {
+    console.log(err.message);
+    return sendRes(res, { status: 500, success: false, message: 'Failed to fetch bookings' });
+  }
+};
+
+export const updateBooking = async (req: Request, res: Response) => {
+  const bookingId = parseInt(req.params.bookingId);
+  const { status } = req.body;
+
+  if (!['cancelled', 'returned'].includes(status)) {
+    return sendRes(res, { status: 400, success: false, message: 'Invalid status' });
+  }
+
+  try {
+    const updatedBooking = await bookingServices.updateBookingStatus(bookingId, status);
+    const msg = status === 'cancelled' ? 'Booking cancelled successfully' : 'Booking marked as returned. Vehicle is now available';
+    return sendRes(res, { status: 200, success: true, message: msg, data: updatedBooking });
+  } catch (err: any) {
+    console.log(err.message);
+    return sendRes(res, { status: 500, success: false, message: 'Failed to update booking' });
+  }
+};
 
 
-//     if () {
-//         return sendRes(res, {
-//             status: 400,
-//             success: false,
-//             message: "Please provide name, email, password & phone number",
-//             data: null,
-//         });
-//     }
-//     if (!["admin", "customer"].includes(role)) {
-//         return sendRes(res, {
-//             status: 400,
-//             success: false,
-//             message: "the role would be only 'customer' or 'admin'",
-//             data: null,
-//         });
-//     }
 
 
-//     try {
-//         const hashedPassword = await bcrypt.hash(password, 10);
-
-//         const result = await newUserCreate(name, lowerCasedEmail, hashedPassword, phone, role)
-
-//         return sendRes(res, {
-//             status: 201,
-//             success: true,
-//             message: "User created successfully",
-//             data: result.rows[0],
-//         });
-
-//     } catch (error: any) {
-//         console.log(error.message);
-//         return sendRes(res, {
-//             status: 500,
-//             success: false,
-//             message: "User creation failed due to server error",
-//             data: null,
-//         });
-//     }
-// };
-
-// export const bookingController = {
-//     createUser: booking,
-// };
+export const bookingController = {
+  newBooking, getAllBooking, updateBooking
+}
