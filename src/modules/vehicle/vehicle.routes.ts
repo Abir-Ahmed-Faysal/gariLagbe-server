@@ -9,13 +9,15 @@ import Roles from '../user/auth.constrain';
 const router = express.Router()
 
 
+router.get('/', vehicleController.getAllVehicle)
+
+router.get('/:vehicleId', vehicleController.singleVehicle)
 
 router.post('/', verifyUser(Roles.admin), vehicleController.addNewVehicle)
 
-router.get('/',  vehicleController.getAllVehicle)
+router.put('/:vehicleId', verifyUser(Roles.admin), vehicleController.updateVehicle)
 
- router.get('/:vehicleId',  vehicleController.singleVehicle)
-
+router.delete('/:vehicleId', verifyUser(Roles.admin), vehicleController.deleteVehicle)
 
 
 export const vehicleRoutes = router

@@ -29,6 +29,16 @@ const signup = async (req: Request, res: Response) => {
         });
     }
 
+if (password.length < 6) {
+  return sendRes(res, {
+    status: 400,
+    success: false,
+    message: "Password must be at least 6 characters long",
+    data: null,
+  });
+}
+
+
     const lowerCasedEmail = email.toLowerCase();
 
     try {

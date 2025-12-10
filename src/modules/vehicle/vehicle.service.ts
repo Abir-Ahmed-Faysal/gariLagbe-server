@@ -66,7 +66,69 @@ availability_status FROM vehicles
 
 
 
+const updateVehicle = async (vehicleId: string, payload: { [key: string]: any }) => {
+
+    const keys = Object.keys(payload);
+
+    if (keys.length < 1) {
+        throw new Error("You must provide update fields");
+    }
+
+
+    const setQuery = keys.map((key, index) => `${key} = $${index + 1}`).join(", ");
+
+    const values = Object.values(payload);
+
+    values.push(vehicleId);
+
+    const result = await pool.query(
+        `
+        UPDATE vehicles 
+        SET ${setQuery} 
+        WHERE id = $${values.length}
+        RETURNING *
+        `,
+        values
+    );
+
+
+    return result;
+};
+
+
+
+const deleteVehicle = async (id: string) => {
+    try {
+
+        const result = await pool.query(`
+    DELETE FROM vehicles
+    WHERE id = $1 AND availability_status = 'available'
+    RETURNING *
+  `, [id]);
+        return result;
+    } catch (error) {
+        throw new Error
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export const vehicleService = {
-    getAllVehicle, addNewVehicle, singleVehicle
+    getAllVehicle, addNewVehicle, singleVehicle, updateVehicle, deleteVehicle
 }
+

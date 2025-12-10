@@ -78,11 +78,6 @@ const createBooking = async (
 };
 
 
-
-
-
-
-// Update booking status (cancel/return)
 const updateBookingStatus = async (bookingId: number, status: 'cancelled' | 'returned') => {
   // Update booking
   const booking = await pool.query(
@@ -127,8 +122,6 @@ const getAllBookings = async (userId: number, role: 'admin' | 'customer') => {
     b.vehicle_id,
     b.total_price,
     b.status,
-    b.created_at,
-    b.updated_at,
     b.rent_start_date::date AS rent_start_date,
     b.rent_end_date::date AS rent_end_date,
     json_build_object('name', u.name, 'email', u.email) AS customer,
@@ -146,8 +139,6 @@ const getAllBookings = async (userId: number, role: 'admin' | 'customer') => {
     b.vehicle_id,
     b.total_price,
     b.status,
-    b.created_at,
-    b.updated_at,
     b.rent_start_date::date AS rent_start_date,
     b.rent_end_date::date AS rent_end_date,
     json_build_object('vehicle_name', v.vehicle_name, 'registration_number', v.registration_number, 'type', v.type) AS vehicle
@@ -162,8 +153,6 @@ const getAllBookings = async (userId: number, role: 'admin' | 'customer') => {
   const result = await pool.query(query, params);
   return result.rows;
 };
-
-
 
 
 export const bookingServices = {

@@ -9,7 +9,7 @@ import Roles from '../user/auth.constrain';
 const router = express.Router()
 
 
-router.get('/', bookingController.getAllBooking)
+router.get('/', verifyUser(Roles.admin, Roles.user), bookingController.getAllBooking)
 
 router.post('/', verifyUser(Roles.admin, Roles.user), bookingController.newBooking)
 

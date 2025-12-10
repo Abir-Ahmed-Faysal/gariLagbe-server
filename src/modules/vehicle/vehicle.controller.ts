@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { sendRes } from "../../utilities/sendRes";
 import { vehicleService } from "./vehicle.service";
+import { cleanPayload } from "../../utilities/cleaningPayload";
+
 
 
 const addNewVehicle = async (req: Request, res: Response) => {
@@ -88,8 +90,6 @@ const addNewVehicle = async (req: Request, res: Response) => {
 };
 
 
-
-
 const getAllVehicle = async (req: Request, res: Response) => {
 
     try {
@@ -123,12 +123,11 @@ const getAllVehicle = async (req: Request, res: Response) => {
 }
 
 
-
-const singleVehicle=async(req:Request,res:Response)=>{
+const singleVehicle = async (req: Request, res: Response) => {
 
 
     const { vehicleId } = req.params;
-   
+
 
     try {
         const result = await vehicleService.singleVehicle(vehicleId as string);
@@ -161,6 +160,94 @@ const singleVehicle=async(req:Request,res:Response)=>{
 }
 
 
+const updateVehicle = async (req: Request, res: Response) => {
+
+    const { vehicleId } = req.params
+    const {
+        vehicle_name, type, registration_number,
+        daily_rent_price,
+        availability_status
+    } = req.body
+
+
+
+    const rowPayload: { [key: string]: any } = {
+        vehicle_name,
+        type,
+        registration_number,
+        daily_rent_price,
+        availability_status
+    };
+
+    const payload = cleanPayload(rowPayload)
+
+
+    const allowedTypes = ['car', 'bike', 'van', 'SUV'];
+    const allowedStatus = ['available', 'booked'];
+
+    if (payload.type !== undefined && !allowedTypes.includes(payload.type)) {
+        return sendRes(res, {
+            status: 400,
+            success: false,
+            message: `Type must be one of ${allowedTypes.join(', ')}`,
+            data: null,
+        });
+    }
+
+    if (payload.daily_rent_price !== undefined && payload.daily_rent_price <= 0) {
+        return sendRes(res, {
+            status: 400,
+            success: false,
+            message: 'Daily rent price must be positive',
+            data: null,
+        });
+    }
+
+    if (payload.availability_status !== undefined && !allowedStatus.includes(payload.availability_status)) {
+        return sendRes(res, {
+            status: 400,
+            success: false,
+            message: `Availability status must be one of ${allowedStatus.join(', ')}`,
+            data: null,
+        });
+    }
+
+
+
+
+    const result = await vehicleService.updateVehicle(vehicleId!, payload)
+
+    return sendRes(res, {
+        status: 200,
+        success: true,
+        message: `id ${vehicleId} no vehicle update successfully`,
+        data: result.rows[0]
+    })
+}
+
+
+
+
+const deleteVehicle = async (req: Request, res: Response) => {
+  const id = req.params.vehicleId as string
+
+  const result = await vehicleService.deleteVehicle(id);
+
+  if (result.rows.length === 0) {
+    return sendRes(res, {
+      status: 400,
+      success: false,
+      message: "Vehicle not found or already booked",
+    });
+  }
+
+  return sendRes(res, {
+    status: 200,
+    success: true,
+    message: "Vehicle deleted successfully",
+    data: result.rows[0],
+  });
+};
 
 
 
@@ -169,5 +256,5 @@ const singleVehicle=async(req:Request,res:Response)=>{
 
 
 export const vehicleController = {
-    addNewVehicle, getAllVehicle,singleVehicle,
+    addNewVehicle, getAllVehicle, singleVehicle, updateVehicle, deleteVehicle
 };
