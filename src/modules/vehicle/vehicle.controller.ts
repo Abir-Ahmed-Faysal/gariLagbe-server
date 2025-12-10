@@ -58,6 +58,9 @@ const addNewVehicle = async (req: Request, res: Response) => {
             daily_rent_price,
             availability_status)
 
+
+
+
         return sendRes(res, {
             status: 201,
             success: true,
@@ -95,17 +98,17 @@ const getAllVehicle = async (req: Request, res: Response) => {
 
         if (result.rows.length === 0) {
             return sendRes(res, {
-                status: 404,
-                success: false,
-                message: "no vehicle found",
-                data: null,
+                status: 200,
+                success: true,
+                message: "No vehicles found",
+                data: [],
             });
         }
 
         return sendRes(res, {
             status: 200,
             success: true,
-            message: "vehicle data fetch successfully",
+            message: "Vehicles retrieved successfully",
             data: result.rows,
         });
 
@@ -121,6 +124,44 @@ const getAllVehicle = async (req: Request, res: Response) => {
 
 
 
+const singleVehicle=async(req:Request,res:Response)=>{
+
+
+    const { vehicleId } = req.params;
+   
+
+    try {
+        const result = await vehicleService.singleVehicle(vehicleId as string);
+
+        if (!result || result.rows.length === 0) {
+            return sendRes(res, {
+                status: 200,
+                success: true,
+                message: "No vehicles found",
+                data: [],
+            });
+        }
+
+        return sendRes(res, {
+            status: 200,
+            success: true,
+            message: "Vehicle retrieved successfully",
+            data: result.rows[0],
+        });
+
+    } catch (error: any) {
+        console.log("Error fetching user:", error.message);
+        return sendRes(res, {
+            status: 500,
+            success: false,
+            message: "Failed to fetch user",
+            data: null,
+        });
+    }
+}
+
+
+
 
 
 
@@ -128,5 +169,5 @@ const getAllVehicle = async (req: Request, res: Response) => {
 
 
 export const vehicleController = {
-    addNewVehicle, getAllVehicle
+    addNewVehicle, getAllVehicle,singleVehicle,
 };

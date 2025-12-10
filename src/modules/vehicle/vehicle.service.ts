@@ -16,17 +16,16 @@ const addNewVehicle = async (vehicle_name: string,
             
           RETURNING id,
 vehicle_name,
-type,
-registration_number,
-daily_rent_price,
-availability_status`, [vehicle_name,
+        type,
+        registration_number,
+        daily_rent_price,
+        availability_status`, [vehicle_name,
         type,
         registration_number,
         daily_rent_price,
         availability_status])
     return result
 }
-
 
 
 const getAllVehicle = async () => {
@@ -43,7 +42,31 @@ const getAllVehicle = async () => {
 }
 
 
+const singleVehicle = async (vehicleId: string) => {
+    try {
+        const result = await pool.query(`
+            SELECT id,
+vehicle_name,
+type,
+registration_number,
+daily_rent_price,
+availability_status FROM vehicles
+            `)
+
+
+
+
+        return result;
+
+    } catch (error: any) {
+        console.log(error);
+        throw new Error(error?.message || "database error")
+    }
+}
+
+
+
 
 export const vehicleService = {
-    getAllVehicle, addNewVehicle
+    getAllVehicle, addNewVehicle, singleVehicle
 }

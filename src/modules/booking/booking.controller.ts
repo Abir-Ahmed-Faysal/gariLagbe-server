@@ -26,6 +26,8 @@ export const getAllBooking = async (req: Request, res: Response) => {
 
   try {
     const bookings = await bookingServices.getAllBookings(userId, role);
+
+
     return sendRes(res, { status: 200, success: true, message: role === 'admin' ? 'Bookings retrieved successfully' : 'Your bookings retrieved successfully', data: bookings });
   } catch (err: any) {
     console.log(err.message);
@@ -34,7 +36,7 @@ export const getAllBooking = async (req: Request, res: Response) => {
 };
 
 export const updateBooking = async (req: Request, res: Response) => {
-  const bookingId = parseInt(req.params.bookingId);
+  const bookingId = parseInt(req.params.bookingId as string);
   const { status } = req.body;
 
   if (!['cancelled', 'returned'].includes(status)) {
@@ -50,9 +52,6 @@ export const updateBooking = async (req: Request, res: Response) => {
     return sendRes(res, { status: 500, success: false, message: 'Failed to update booking' });
   }
 };
-
-
-
 
 export const bookingController = {
   newBooking, getAllBooking, updateBooking
