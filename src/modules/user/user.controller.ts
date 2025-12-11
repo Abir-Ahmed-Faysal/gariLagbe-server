@@ -78,6 +78,19 @@ const updateUser = async (req: Request, res: Response) => {
 
     const { userId } = req.params
 
+    const decodedUser = req.user as JwtPayload
+
+    if (decodedUser.id.toString() !== userId && decodedUser.role !== 'admin') {
+        return sendRes(res, {
+            status: 403,
+            success: false,
+            message: `failed to update`,
+            data: null,
+        });
+    }
+
+
+
     const {
         name,
         email,
@@ -101,6 +114,17 @@ const updateUser = async (req: Request, res: Response) => {
 
     const allowedRole = ['admin', 'customer'];
 
+
+
+
+
+    if (payload.email) {
+        payload.email = payload.email.toLowerCase();
+    }
+
+
+
+
     if (payload.type !== undefined && !allowedRole.includes(payload.role)) {
         return sendRes(res, {
             status: 400,
@@ -116,6 +140,11 @@ const updateUser = async (req: Request, res: Response) => {
 
     const result = await userServices.updateUser(userId!, payload)
 
+
+
+
+
+
     return sendRes(res, {
         status: 200,
         success: true,
@@ -128,15 +157,28 @@ const updateUser = async (req: Request, res: Response) => {
 
 
 const deleteUser = async (req: Request, res: Response) => {
-    const id = req.params.userId as string
+    const id = req.params.userId as string;
+
+
+    const bookingResult = await userServices.getBookingStatus(id);
+
+    console.log(bookingResult);
+
+    if (bookingResult.rowCount !== 0) {
+        return sendRes(res, {
+            status: 400,
+            success: false,
+            message: "The user has active bookings",
+        });
+    }
 
     const result = await userServices.deleteUser(id);
 
     if (result.rowCount === 0) {
         return sendRes(res, {
-            status: 400,
+            status: 404,
             success: false,
-            message: "user not found ",
+            message: "User not found",
         });
     }
 
@@ -146,6 +188,7 @@ const deleteUser = async (req: Request, res: Response) => {
         message: "User deleted successfully",
     });
 };
+
 
 
 

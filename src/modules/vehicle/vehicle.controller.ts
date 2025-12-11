@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { sendRes } from "../../utilities/sendRes";
 import { vehicleService } from "./vehicle.service";
 import { cleanPayload } from "../../utilities/cleaningPayload";
+import { JwtPayload } from "jsonwebtoken";
 
 
 
@@ -47,13 +48,7 @@ const addNewVehicle = async (req: Request, res: Response) => {
         });
     }
 
-
-
-
-
     try {
-
-
         const result = await vehicleService.addNewVehicle(vehicle_name,
             type,
             registration_number,
@@ -66,7 +61,7 @@ const addNewVehicle = async (req: Request, res: Response) => {
         return sendRes(res, {
             status: 201,
             success: true,
-            message: "User created successfully",
+            message: "vehicle created successfully",
             data: result.rows[0],
         });
 
@@ -163,6 +158,21 @@ const singleVehicle = async (req: Request, res: Response) => {
 const updateVehicle = async (req: Request, res: Response) => {
 
     const { vehicleId } = req.params
+
+    const decodedUser = req.user as JwtPayload
+
+    if (decodedUser.id.toString() !== vehicleId && decodedUser.role !== 'admin') {
+        return sendRes(res, {
+            status: 403,
+            success: false,
+            message: `failed to update`,
+            data: null,
+        });
+    }
+
+
+
+
     const {
         vehicle_name, type, registration_number,
         daily_rent_price,
@@ -231,13 +241,27 @@ const updateVehicle = async (req: Request, res: Response) => {
 const deleteVehicle = async (req: Request, res: Response) => {
     const id = req.params.vehicleId as string
 
+    const getBookingStatus = await vehicleService.getBookingStatus(id)
+
+    console.log(getBookingStatus.rows);
+    if (getBookingStatus.rowCount !== 0) {
+        return sendRes(res, {
+            status: 400,
+            success: false,
+            message: "Vehicle has already booked",
+        });
+    }
+
+
+
     const result = await vehicleService.deleteVehicle(id);
+    console.log(result.rows);
 
     if (result.rows.length === 0) {
         return sendRes(res, {
             status: 400,
             success: false,
-            message: "Vehicle not found or already booked",
+            message: " already booked or Vehicle not found ",
         });
     }
 
@@ -245,7 +269,6 @@ const deleteVehicle = async (req: Request, res: Response) => {
         status: 200,
         success: true,
         message: "Vehicle deleted successfully",
-        data: result.rows[0],
     });
 };
 

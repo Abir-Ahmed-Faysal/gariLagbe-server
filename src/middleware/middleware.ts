@@ -36,6 +36,7 @@ const verifyUser = (...roles: ('admin' | 'customer')[]) => {
             res.status(400).json({ success: true, message: "you are not authorized" })
 
         }
+        console.log(req.user);
         next();
     };
 };

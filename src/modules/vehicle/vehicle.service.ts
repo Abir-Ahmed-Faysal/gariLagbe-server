@@ -50,8 +50,25 @@ vehicle_name,
 type,
 registration_number,
 daily_rent_price,
-availability_status FROM vehicles
-            `)
+availability_status FROM vehicles WHERE id=$1
+            `,[vehicleId])
+
+
+
+
+        return result;
+
+    } catch (error: any) {
+        console.log(error);
+        throw new Error(error?.message || "database error")
+    }
+}
+const getBookingStatus = async (vehicleId: string) => {
+    try {
+        const result = await pool.query(`
+            SELECT id,
+status FROM bookings WHERE vehicle_id=$1
+            `,[vehicleId])
 
 
 
@@ -111,5 +128,5 @@ const deleteVehicle = async (id: string) => {
 
 
 export const vehicleService = {
-    getAllVehicle, addNewVehicle, singleVehicle, updateVehicle, deleteVehicle
+    getAllVehicle, addNewVehicle, singleVehicle, updateVehicle, deleteVehicle,getBookingStatus
 }

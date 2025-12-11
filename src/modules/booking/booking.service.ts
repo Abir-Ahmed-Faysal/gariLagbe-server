@@ -1,6 +1,6 @@
 import { pool } from "../../config/db";
 
-// Auto-return expired bookings
+
 export const autoReturnExpiredBookings = async () => {
   const expiredBookings = await pool.query(`
     SELECT id, vehicle_id
@@ -23,7 +23,7 @@ export const autoReturnExpiredBookings = async () => {
   return expiredBookings.rows.length;
 };
 
-// Create new booking
+
 const createBooking = async (
   customer_id: number,
   vehicle_id: number,
@@ -73,29 +73,54 @@ const createBooking = async (
     WHERE b.id = $1`,
     [bookingResult.rows[0].id]
   );
-
   return bookingWithVehicle.rows[0];
 };
 
 
-const updateBookingStatus = async (bookingId: number, status: 'cancelled' | 'returned') => {
-  // Update booking
-  const booking = await pool.query(
-    `UPDATE bookings SET status = $1 WHERE id = $2 RETURNING *`,
-    [status, bookingId]
+const updateBookingStatus = async (
+  bookingId: string,
+  status: "cancelled" | "returned"
+) => {
+  let finalStatus = status;
+
+
+  const updatedBooking = await pool.query(
+    `UPDATE bookings 
+     SET status = $1 
+     WHERE id = $2 
+     RETURNING *`,
+    [finalStatus, bookingId]
   );
 
-  // Update vehicle availability if cancelled or returned
-  if (status === 'cancelled' || status === 'returned') {
+  if (updatedBooking.rows.length === 0) {
+    throw new Error("Booking not found");
+  }
+
+  const booking = updatedBooking.rows[0];
+
+
+  if (status === "returned") {
     await pool.query(
-      `UPDATE vehicles SET availability_status = 'available' WHERE id = $1`,
-      [booking.rows[0].vehicle_id]
+      `UPDATE vehicles 
+       SET availability_status = 'available' 
+       WHERE id = $1`,
+      [booking.vehicle_id]
     );
   }
 
-  // Return updated booking with vehicle info
-  const updatedBooking = await pool.query(
-    `SELECT b.*, json_build_object(
+
+
+
+
+  const result = await pool.query(
+    `SELECT b.id,
+b.customer_id,
+b.vehicle_id,
+TO_CHAR(b.rent_start_date, 'YYYY-MM-DD') AS rent_start_date,
+TO_CHAR(b.rent_end_date, 'YYYY-MM-DD') AS rent_end_date,
+b.total_price,
+b.status, 
+      json_build_object(
         'availability_status', v.availability_status
       ) AS vehicle
      FROM bookings b
@@ -104,8 +129,9 @@ const updateBookingStatus = async (bookingId: number, status: 'cancelled' | 'ret
     [bookingId]
   );
 
-  return updatedBooking.rows[0];
+  return result.rows[0];
 };
+
 
 
 const getAllBookings = async (userId: number, role: 'admin' | 'customer') => {
@@ -155,6 +181,25 @@ const getAllBookings = async (userId: number, role: 'admin' | 'customer') => {
 };
 
 
+
+const getSingleBooking = async (bookingId: string) => {
+
+
+  try {
+    const result = await pool.query(`
+    SELECT customer_id,status FROM bookings
+      WHERE id=$1`, [bookingId])
+
+    return result
+
+  } catch (error: any) {
+    console.log(error?.message);
+    throw new Error(error?.message || "database error")
+  }
+}
+
+
 export const bookingServices = {
   getAllBookings, updateBookingStatus, autoReturnExpiredBookings, createBooking,
+  getSingleBooking
 }

@@ -44,7 +44,7 @@ const updateUser = async (vehicleId: string, payload: { [key: string]: any }) =>
 
   const result = await pool.query(
     `
-        UPDATE vehicles 
+        UPDATE users 
         SET ${setQuery} 
         WHERE id = $${values.length}
         RETURNING *
@@ -59,16 +59,32 @@ const updateUser = async (vehicleId: string, payload: { [key: string]: any }) =>
 
 const deleteUser = async (id: string) => {
   try {
+    const result = await pool.query(
+      `DELETE FROM users WHERE id = $1`,
+      [id]
+    );
 
-    const result = await pool.query(`
-    DELETE FROM users
-    WHERE id = $1 
-  `, [id]);
     return result;
-  } catch (error) {
-    throw new Error
+  } catch (error: any) {
+    throw new Error(error?.message || "Failed to delete user");
   }
-}
+};
+
+
+
+const getBookingStatus = async (id: string) => {
+  try {
+    const result = await pool.query(
+      `SELECT id FROM bookings WHERE customer_id = $1 AND status = 'active'`,
+      [id]
+    );
+
+    return result;
+  } catch (error: any) {
+    console.log(error?.message);
+    throw new Error(error?.message || 'Database error fetching booking status');
+  }
+};
 
 
 
@@ -77,5 +93,6 @@ export const userServices = {
   getAllUserLogic,
   updateUser,
   deleteUser,
-  getSingleUer
+  getSingleUer,
+  getBookingStatus,
 };
