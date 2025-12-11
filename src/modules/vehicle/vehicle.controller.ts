@@ -220,7 +220,7 @@ const updateVehicle = async (req: Request, res: Response) => {
     return sendRes(res, {
         status: 200,
         success: true,
-        message: `id ${vehicleId} no vehicle update successfully`,
+        message: `Vehicle updated successfully`,
         data: result.rows[0]
     })
 }
@@ -229,30 +229,25 @@ const updateVehicle = async (req: Request, res: Response) => {
 
 
 const deleteVehicle = async (req: Request, res: Response) => {
-  const id = req.params.vehicleId as string
+    const id = req.params.vehicleId as string
 
-  const result = await vehicleService.deleteVehicle(id);
+    const result = await vehicleService.deleteVehicle(id);
 
-  if (result.rows.length === 0) {
+    if (result.rows.length === 0) {
+        return sendRes(res, {
+            status: 400,
+            success: false,
+            message: "Vehicle not found or already booked",
+        });
+    }
+
     return sendRes(res, {
-      status: 400,
-      success: false,
-      message: "Vehicle not found or already booked",
+        status: 200,
+        success: true,
+        message: "Vehicle deleted successfully",
+        data: result.rows[0],
     });
-  }
-
-  return sendRes(res, {
-    status: 200,
-    success: true,
-    message: "Vehicle deleted successfully",
-    data: result.rows[0],
-  });
 };
-
-
-
-
-
 
 
 export const vehicleController = {

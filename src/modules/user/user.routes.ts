@@ -9,8 +9,13 @@ import { hitApi } from '../../utilities/hitApi';
 const router = express.Router()
 
 
- router.get('/',hitApi, verifyUser(Roles.admin), userController.getAllUser)
-router.get('/:userId',verifyUser(Roles.admin,Roles.user), userController.getSingleUser)
+router.get('/', verifyUser(Roles.admin), userController.getAllUser)
+
+router.get('/:userId', verifyUser(Roles.admin, Roles.customer), userController.getSingleUser)
+
+router.put('/:userId', verifyUser(Roles.admin, Roles.customer), userController.updateUser)
+
+router.delete('/:userId', verifyUser(Roles.admin), userController.deleteUser)
 
 
 

@@ -27,10 +27,55 @@ const getSingleUer = async (userId: string) => {
 }
 
 
-const updateLogic = async () => {
+const updateUser = async (vehicleId: string, payload: { [key: string]: any }) => {
+
+  const keys = Object.keys(payload);
+
+  if (keys.length < 1) {
+    throw new Error("You must provide update fields");
+  }
+
+
+  const setQuery = keys.map((key, index) => `${key} = $${index + 1}`).join(", ");
+
+  const values = Object.values(payload);
+
+  values.push(vehicleId);
+
+  const result = await pool.query(
+    `
+        UPDATE vehicles 
+        SET ${setQuery} 
+        WHERE id = $${values.length}
+        RETURNING *
+        `,
+    values
+  );
+
+
+  return result;
+};
+
+
+const deleteUser = async (id: string) => {
+  try {
+
+    const result = await pool.query(`
+    DELETE FROM users
+    WHERE id = $1 
+  `, [id]);
+    return result;
+  } catch (error) {
+    throw new Error
+  }
 }
 
 
 
 
-export const userServices = {getAllUserLogic,  updateLogic, getSingleUer };
+export const userServices = {
+  getAllUserLogic,
+  updateUser,
+  deleteUser,
+  getSingleUer
+};

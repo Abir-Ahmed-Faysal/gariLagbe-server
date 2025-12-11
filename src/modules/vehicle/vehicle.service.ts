@@ -65,7 +65,6 @@ availability_status FROM vehicles
 }
 
 
-
 const updateVehicle = async (vehicleId: string, payload: { [key: string]: any }) => {
 
     const keys = Object.keys(payload);
@@ -96,7 +95,6 @@ const updateVehicle = async (vehicleId: string, payload: { [key: string]: any })
 };
 
 
-
 const deleteVehicle = async (id: string) => {
     try {
 
@@ -112,23 +110,6 @@ const deleteVehicle = async (id: string) => {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 export const vehicleService = {
     getAllVehicle, addNewVehicle, singleVehicle, updateVehicle, deleteVehicle
 }
-

@@ -4,7 +4,7 @@ import { secret } from "../modules/auth/auth.service";
 import { pool } from "../config/db";
 
 
-const verifyUser = (...roles: ('admin' | 'user')[]) => {
+const verifyUser = (...roles: ('admin' | 'customer')[]) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         const authHeader = req.headers?.authorization;
         
