@@ -14,15 +14,15 @@ export const newBooking = async (req: Request, res: Response) => {
   if (decodedUser.id.toString() !== customer_id.toString() && decodedUser.role !== 'admin') {
 
     return sendRes(res, {
-      status: 403,
+      status: 400,
       success: false,
-      message: `failed to add a booking due to wrong customer id`,
-      data: null,
+      message: `bad response`,
+      errors:"failed to add a booking due to wrong customer id",
     });
   }
 
   if (!customer_id || !vehicle_id || !rent_start_date || !rent_end_date) {
-    return sendRes(res, { status: 400, success: false, message: 'All fields are required' });
+    return sendRes(res, { status: 400, success: false, message: 'bad request',errors:"all field are required " });
   }
 
   try {
@@ -30,7 +30,7 @@ export const newBooking = async (req: Request, res: Response) => {
     return sendRes(res, { status: 201, success: true, message: 'Booking created successfully', data: booking });
   } catch (err: any) {
     console.log(err.message);
-    return sendRes(res, { status: 500, success: false, message: 'Booking creation failed' });
+    return sendRes(res, { status: 500, success: false, message: 'Booking creation failed',errors:"server error" });
   }
 };
 
@@ -46,7 +46,7 @@ export const getAllBooking = async (req: Request, res: Response) => {
     return sendRes(res, { status: 200, success: true, message: role === 'admin' ? 'Bookings retrieved successfully' : 'Your bookings retrieved successfully', data: bookings });
   } catch (err: any) {
     console.log(err.message);
-    return sendRes(res, { status: 500, success: false, message: 'Failed to fetch bookings' });
+    return sendRes(res, { status: 500, success: false, message: 'Failed to fetch bookings',errors:'server error' });
   }
 };
 
@@ -60,10 +60,10 @@ export const updateBooking = async (req: Request, res: Response) => {
   if(!status){
 
 return sendRes(res, {
-      status: 404,
+      status: 400,
       success: false,
       message: "your status is missing",
-      data: null,
+      errors: "the status must be included"
     });
 
   }
@@ -74,10 +74,10 @@ return sendRes(res, {
   
   if (!booking) {
     return sendRes(res, {
-      status: 404,
+      status: 400,
       success: false,
-      message: "Booking not found",
-      data: null,
+      message: "no Booking found",
+      errors: "the booking  data not exist on the database",
     });
   }
 
@@ -88,11 +88,11 @@ return sendRes(res, {
       status: 403,
       success: false,
       message: "This booking already stopped",
-      data: null,
+      errors: "the booking not available",
     });
   }
 
-  console.log("hit here", booking, decodedUser);
+
   const isOwner = decodedUser.id == booking.customer_id;
   const isAdmin = decodedUser.role === "admin";
 
@@ -101,7 +101,7 @@ return sendRes(res, {
       status: 403,
       success: false,
       message: "You are not allowed to update this booking",
-      data: null,
+      errors: "you must have to registered",
     });
   }
 
@@ -110,7 +110,7 @@ return sendRes(res, {
       status: 403,
       success: false,
       message: "Customers can only cancel bookings",
-      data: null,
+      errors: "customer can only cancel the booking",
     });
   }
 
@@ -120,7 +120,7 @@ return sendRes(res, {
       status: 403,
       success: false,
       message: "Admin can only mark bookings as returned",
-      data: null,
+      errors:"admin can only change booking status as returned",
     });
   }
 
@@ -130,6 +130,7 @@ return sendRes(res, {
       status: 400,
       success: false,
       message: "Invalid status",
+      errors:"the booking status must be only 'cancelled' or 'returned'"
     });
   }
 
@@ -156,6 +157,7 @@ return sendRes(res, {
       status: 500,
       success: false,
       message: "Failed to update booking",
+      errors:"server error"
     });
   }
 };

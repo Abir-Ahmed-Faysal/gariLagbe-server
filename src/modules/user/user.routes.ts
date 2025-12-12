@@ -2,7 +2,7 @@ import express from 'express';
 import { userController } from './user.controller';
 import verifyUser from '../../middleware/middleware';
 import Roles from './auth.constrain';
-import { hitApi } from '../../utilities/hitApi';
+
 
 
 

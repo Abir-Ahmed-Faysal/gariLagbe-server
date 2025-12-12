@@ -1,5 +1,5 @@
 import express from 'express';
-import { hitApi } from '../../utilities/hitApi';
+
 import { bookingController } from './booking.controller';
 import verifyUser from '../../middleware/middleware';
 import Roles from '../user/auth.constrain';

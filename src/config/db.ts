@@ -42,7 +42,7 @@ const initDb = async () => {
       );
     `);
 
-    console.log('Database connected & Tables created successfully!');
+    console.log('Database connected ');
   } catch (error: any) {
     console.error('DB Error:', error);
   }

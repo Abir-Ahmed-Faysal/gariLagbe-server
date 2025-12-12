@@ -37,7 +37,8 @@ const getSingleUser = async (req: Request, res: Response) => {
     if (loggedInUser.id !== userId && !["admin", "customer"].includes(loggedInUser.role)) {
         return res.status(403).json({
             success: false,
-            message: "the user role must be admin or customer only or user did not match"
+            message: "access denied",
+            errors: "the user role must be admin or customer only or user did not match"
         });
     }
 
@@ -49,7 +50,7 @@ const getSingleUser = async (req: Request, res: Response) => {
                 status: 404,
                 success: false,
                 message: "User not found",
-                data: null,
+                errors: "the user did not find",
             });
         }
 
@@ -66,7 +67,7 @@ const getSingleUser = async (req: Request, res: Response) => {
             status: 500,
             success: false,
             message: "Failed to fetch user",
-            data: null,
+            errors: "server error",
         });
     }
 };
@@ -84,8 +85,8 @@ const updateUser = async (req: Request, res: Response) => {
         return sendRes(res, {
             status: 403,
             success: false,
-            message: `failed to update`,
-            data: null,
+            message: `access denied`,
+            errors: "failed to update",
         });
     }
 
@@ -114,23 +115,16 @@ const updateUser = async (req: Request, res: Response) => {
 
     const allowedRole = ['admin', 'customer'];
 
-
-
-
-
     if (payload.email) {
         payload.email = payload.email.toLowerCase();
     }
-
-
-
 
     if (payload.type !== undefined && !allowedRole.includes(payload.role)) {
         return sendRes(res, {
             status: 400,
             success: false,
             message: `Type must be one of ${allowedRole.join(', ')}`,
-            data: null,
+            errors: " the user role must be admin or customer only",
         });
     }
 
@@ -162,13 +156,13 @@ const deleteUser = async (req: Request, res: Response) => {
 
     const bookingResult = await userServices.getBookingStatus(id);
 
-    console.log(bookingResult);
 
     if (bookingResult.rowCount !== 0) {
         return sendRes(res, {
             status: 400,
             success: false,
             message: "The user has active bookings",
+            errors: "the user has actively booking due to the booking result not found"
         });
     }
 
@@ -178,7 +172,8 @@ const deleteUser = async (req: Request, res: Response) => {
         return sendRes(res, {
             status: 404,
             success: false,
-            message: "User not found",
+            message: "Invalid user not found",
+            errors: "the  user not found on the db"
         });
     }
 

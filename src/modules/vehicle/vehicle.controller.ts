@@ -12,7 +12,7 @@ const addNewVehicle = async (req: Request, res: Response) => {
         registration_number,
         daily_rent_price,
         availability_status } = req.body;
-    console.log(req.body);
+
 
 
     if (!vehicle_name || !type || !registration_number || !
@@ -161,12 +161,13 @@ const updateVehicle = async (req: Request, res: Response) => {
 
     const decodedUser = req.user as JwtPayload
 
-    if (decodedUser.id.toString() !== vehicleId && decodedUser.role !== 'admin') {
+
+    if (decodedUser.role !== 'admin') {
         return sendRes(res, {
             status: 403,
             success: false,
             message: `failed to update`,
-            data: null,
+            errors: "you did not update the vehicle details",
         });
     }
 
@@ -200,7 +201,7 @@ const updateVehicle = async (req: Request, res: Response) => {
             status: 400,
             success: false,
             message: `Type must be one of ${allowedTypes.join(', ')}`,
-            data: null,
+            errors: "you have to select payload as car bike or suv only ...",
         });
     }
 
@@ -209,7 +210,7 @@ const updateVehicle = async (req: Request, res: Response) => {
             status: 400,
             success: false,
             message: 'Daily rent price must be positive',
-            data: null,
+            errors: "you must be get set the rent price only positive value"
         });
     }
 
@@ -218,7 +219,7 @@ const updateVehicle = async (req: Request, res: Response) => {
             status: 400,
             success: false,
             message: `Availability status must be one of ${allowedStatus.join(', ')}`,
-            data: null,
+            errors:"the availability status must be available or booked",
         });
     }
 
@@ -243,25 +244,27 @@ const deleteVehicle = async (req: Request, res: Response) => {
 
     const getBookingStatus = await vehicleService.getBookingStatus(id)
 
-    console.log(getBookingStatus.rows);
+
     if (getBookingStatus.rowCount !== 0) {
         return sendRes(res, {
             status: 400,
             success: false,
             message: "Vehicle has already booked",
+            errors: "the vehicle already booked.not available now"
         });
     }
 
 
 
     const result = await vehicleService.deleteVehicle(id);
-    console.log(result.rows);
+
 
     if (result.rows.length === 0) {
         return sendRes(res, {
             status: 400,
             success: false,
             message: " already booked or Vehicle not found ",
+            errors: "the vehicle already booked or vehicle not found now"
         });
     }
 

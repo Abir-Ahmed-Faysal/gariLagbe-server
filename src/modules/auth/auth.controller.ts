@@ -4,7 +4,6 @@ import { sendRes } from "../../utilities/sendRes";
 import bcrypt from "bcryptjs";
 
 
-
 const signup = async (req: Request, res: Response) => {
 
 
@@ -17,27 +16,27 @@ const signup = async (req: Request, res: Response) => {
             status: 400,
             success: false,
             message: "Please provide name, email, password & phone number",
-            data: null,
+            errors: "to create a new user you have to provide Please provide name, email, password & phone number"
         });
     }
+
     if (!["admin", "customer"].includes(role)) {
         return sendRes(res, {
             status: 400,
             success: false,
             message: "the role would be only 'customer' or 'admin'",
-            data: null,
+            errors: "the user role must be customer and admin only",
         });
     }
 
-if (password.length < 6) {
-  return sendRes(res, {
-    status: 400,
-    success: false,
-    message: "Password must be at least 6 characters long",
-    data: null,
-  });
-}
-
+    if (password.length < 6) {
+        return sendRes(res, {
+            status: 400,
+            success: false,
+            message: "Invalid credential",
+            errors: "password need at leas",
+        });
+    }
 
     const lowerCasedEmail = email.toLowerCase();
 
@@ -61,7 +60,7 @@ if (password.length < 6) {
                 status: 409,
                 success: false,
                 message: "Email already exists",
-                data: null,
+                errors: "the email already registered",
             });
         }
 
@@ -69,7 +68,7 @@ if (password.length < 6) {
             status: 500,
             success: false,
             message: error ? error?.message : "User creation failed due to server error",
-            data: null,
+            errors: "user creation failed due to server error",
         });
 
     }
@@ -78,9 +77,6 @@ if (password.length < 6) {
 
 
 }
-
-
-
 
 const loginUser = async (req: Request, res: Response) => {
     try {
@@ -93,16 +89,11 @@ const loginUser = async (req: Request, res: Response) => {
     } catch (error: any) {
         return res.status(500).json({
             success: true,
-            message: error.message,
+            message: error.message || "server error",
+            errors: "server error"
         });
     }
 }
-
-
-
-
-
-
 
 export const authController = {
     loginUser, signup

@@ -1,5 +1,4 @@
 import express from 'express';
-import { hitApi } from '../../utilities/hitApi';
 import { vehicleController } from './vehicle.controller';
 import verifyUser from '../../middleware/middleware';
 import Roles from '../user/auth.constrain';
